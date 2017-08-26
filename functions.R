@@ -24,7 +24,7 @@ calculateReads = function(gene, directory, gff_ex, gff_jx, counts, power, juncti
 			P = P[which(!is.na(mat)),,drop=FALSE]
 			P_binary = P>0
 			if(isoformex==TRUE){
-				P = P_binary*1
+				P = data.frame(P_binary*1)
 				power=1
 				junction_weight=0
 			}
