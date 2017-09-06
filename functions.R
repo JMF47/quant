@@ -12,7 +12,7 @@ llm = function(data, matrix){
 	return(list(mod_out[,1], mod_out[,2]))
 }
 
-calculateReads = function(gene, directory, gff_ex, gff_jx, counts, power, junction_weight, verbose=TRUE, isoformex=FALSE){
+calculateReads = function(gene, directory, gff_ex, gff_jx, counts, power, junction_weight, verbose=TRUE){
 	if(verbose==TRUE){print(which(genes==gene)); flush.console()}
 	path = paste0(directory, gene, ".tab")
 	b = NULL; Vb = NULL; colinear_info = NULL
@@ -23,11 +23,6 @@ calculateReads = function(gene, directory, gff_ex, gff_jx, counts, power, juncti
 		if(sum(!is.na(mat))>0){
 			P = P[which(!is.na(mat)),,drop=FALSE]
 			P_binary = P>0
-			if(isoformex==TRUE){
-				P = data.frame(P_binary*1)
-				power=1
-				junction_weight=0
-			}
 			P_bin_sum = apply(P_binary, 1, sum)
 			P_weight = 1/P_bin_sum^power
 
@@ -44,7 +39,7 @@ calculateReads = function(gene, directory, gff_ex, gff_jx, counts, power, juncti
 			if(dim(P)[2]>1){
 				lm_info = matrix(apply(counts_sub, 2, llm, P))
 				beta = sapply(lm_info, function(x) x[[1]])
-				Vbeta = sapply(lm_info, function(x) x[[2]])
+				Vbeta = sapply(lm_info, function(x) x[[2]])^2
 
 				colinear = which(colnames(P) %in% rownames(beta)==F)
 				if(length(colinear)>0){
