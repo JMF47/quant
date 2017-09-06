@@ -74,37 +74,3 @@ calculateReads = function(gene, directory, gff_ex, gff_jx, counts, power, juncti
 	}
 	return(list(b, Vb, colinear_info))
 }
-
-rescue = function(gene, directory, gff_ex, gff_jx, counts, power, junction_weight, verbose=TRUE){
-	if(verbose==TRUE){print(which(genes==gene)); flush.console()}
-	path = paste0(directory, gene, ".tab")
-	Vbeta = NULL
-	if(file.info(path)$size>0){
-		P = read.table(paste0(directory, gene, ".tab"))
-		mat = match(rownames(P), rownames(counts))
-		P_size_orig = dim(P)[2]
-		if(sum(!is.na(mat))>0){
-			P = P[which(!is.na(mat)),,drop=FALSE]
-			P_binary = P>0
-			P_bin_sum = apply(P_binary, 1, sum)
-			P_weight = 1/P_bin_sum^power
-
-			counts_sub = counts[mat[!is.na(mat)],, drop=FALSE]
-			counts_sub = counts_sub*P_weight
-			P = P*P_weight
-
-			junction_ind = str_detect(rownames(counts_sub), "i")
-			P_weight2 = junction_ind*(junction_weight-1)+1
-			counts_sub = counts_sub*P_weight2
-			P = P*P_weight2
-			
-			colinear_info = NULL
-			if(dim(P)[2]>1){
-				lm_info = matrix(apply(counts_sub, 2, llm, P))
-				beta = sapply(lm_info, function(x) x[[1]])
-				Vbeta = sapply(lm_info, function(x) x[[2]])
-			}
-		}
-	}
-	return(Vbeta)
-}
