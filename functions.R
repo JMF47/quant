@@ -13,7 +13,12 @@ llm = function(data, matrix){
 }
 
 calculateReads = function(gene, directory, gff_ex, gff_jx, counts, power, junction_weight, verbose=TRUE){
-	if(verbose==TRUE){print(which(genes==gene)); flush.console()}
+	if(verbose==TRUE){
+		ind = which(genes==gene)
+		if((ind%%1000)==0){
+			print(ind); flush.console()	
+		}
+	}
 	path = paste0(directory, gene, ".tab")
 	b = NULL; Vb = NULL; colinear_info = NULL
 	if(file.info(path)$size>0){
